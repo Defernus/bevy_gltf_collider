@@ -1,0 +1,15 @@
+[package]
+name = "bevy_gltf_collider"
+version = "0.1.0"
+edition = "2021"
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[dependencies]
+bevy = { version = "0.9.1", features = ["dynamic"] }
+bevy_rapier3d = "0.20.0"
+
+
+[dev-dependencies]
+rand = "0.8.5"
