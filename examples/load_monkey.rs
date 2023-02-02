@@ -53,7 +53,8 @@ fn check_if_loaded(
     };
 
     // get_scene_colliders should be called only once per scene as it will remove the colliders meshes from it
-    game_assets.monkey_colliders = get_scene_colliders("monkey", &mut meshes, scene);
+    game_assets.monkey_colliders = get_scene_colliders(&mut meshes, &mut scene.world)
+        .expect("Failed to create monkey colliders");
 
     game_state.set(GameState::Loaded).unwrap();
 }

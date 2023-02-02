@@ -4,7 +4,7 @@ Simple crate for [rapier3d](https://rapier.rs/) collider generation from [bevy](
 
 ## Usage
 
-Check [load_object example](./examples/load_object.rs).
+Check [load_monkey example](./examples/load_monkey.rs).
 
 ## How to create gltf file in blender
 
