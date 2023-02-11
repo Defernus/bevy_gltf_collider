@@ -28,12 +28,7 @@ struct QuatData {
 
 impl From<QuatData> for Quat {
     fn from(data: QuatData) -> Self {
-        Quat {
-            x: data.x,
-            y: data.y,
-            z: data.z,
-            w: data.w,
-        }
+        Quat::from_xyzw(data.x, data.y, data.z, data.w)
     }
 }
 
