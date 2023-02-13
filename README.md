@@ -18,3 +18,10 @@ Check [load_monkey example](./examples/load_monkey.rs).
 ![export-2](./assets/images/export-2.jpeg)
 5. Load your scene in bevy and use `bevy_gltf_collider::get_scene_colliders` function to replace meshes with colliders  
 ![bevy](./assets/images/result.jpeg)
+
+# License
+
+Bevy Gltf Collider Generator is distributed under the terms of both the MIT license and the
+Apache License (Version 2.0).
+
+See [LICENSE-APACHE](LICENSE-APACHE) and [LICENSE-MIT](LICENSE-MIT).
