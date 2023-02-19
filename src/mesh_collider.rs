@@ -4,7 +4,7 @@ use bevy::{
 };
 use bevy_rapier3d::prelude::Collider;
 
-const COLLIDER_MESH_NAME: &'static str = "collider";
+const COLLIDER_MESH_NAME: &str = "collider";
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ColliderFromMeshError {
@@ -24,11 +24,11 @@ pub enum ColliderMeshParsingError {
 pub fn get_collider_from_mesh(mesh: &Mesh) -> Result<Collider, ColliderFromMeshError> {
     let positions = mesh
         .attribute(Mesh::ATTRIBUTE_POSITION)
-        .map_or(Err(ColliderFromMeshError::MissingPositions), |v| Ok(v))?;
+        .map_or(Err(ColliderFromMeshError::MissingPositions), Ok)?;
 
     let indices = mesh
         .indices()
-        .map_or(Err(ColliderFromMeshError::MissingIndices), |v| Ok(v))?;
+        .map_or(Err(ColliderFromMeshError::MissingIndices), Ok)?;
 
     let positions = match positions {
         VertexAttributeValues::Float32x3(positions) => positions,
@@ -56,7 +56,7 @@ pub fn get_collider_from_mesh(mesh: &Mesh) -> Result<Collider, ColliderFromMeshE
 
     let collider = Collider::trimesh(vertices, triple_indices);
 
-    return Ok(collider);
+    Ok(collider)
 }
 
 pub(super) fn process_mesh_collider(
@@ -79,9 +79,10 @@ pub(super) fn process_mesh_collider(
         if let Some(mesh) = world.get::<Handle<Mesh>>(child) {
             let mesh = meshes.remove(mesh).unwrap();
 
-            return Some(get_collider_from_mesh(&mesh));
+            Some(get_collider_from_mesh(&mesh))
+        } else {
+            None
         }
-        return None;
     });
 
     Some(

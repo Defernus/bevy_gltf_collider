@@ -44,7 +44,7 @@ pub fn get_scene_colliders(
             None => {}
             Some(Err(err)) => return Err(ColliderFromSceneError::MeshParsingError(err)),
             Some(Ok(collider)) => {
-                let transform = world.get::<Transform>(entity).unwrap().clone();
+                let transform = *world.get::<Transform>(entity).unwrap();
                 result.push((collider, transform));
                 entities_to_despawn.push(entity);
             }

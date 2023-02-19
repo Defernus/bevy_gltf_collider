@@ -32,9 +32,9 @@ impl From<QuatData> for Quat {
     }
 }
 
-const COLLIDER_TYPE_CUBOID: &'static str = "cuboid";
-// const COLLIDER_TYPE_SPHERE: &'static str = "sphere";
-// const COLLIDER_TYPE_CYLINDER: &'static str = "cylinder";
+const COLLIDER_TYPE_CUBOID: &str = "cuboid";
+// const COLLIDER_TYPE_SPHERE: &str = "sphere";
+// const COLLIDER_TYPE_CYLINDER: &str = "cylinder";
 
 #[derive(Debug, Deserialize)]
 struct ColliderData {
@@ -132,11 +132,10 @@ pub(super) fn process_extras_collider(
             translation: c.translation.map_or(Vec3::default(), |v| v.into()),
             rotation: c.rotation.map_or(Quat::default(), |v| v.into()),
             scale: c.scale.map_or(Vec3::default(), |v| v.into()),
-            ..default()
         };
 
         result.push((collider, transform));
     }
 
-    return Some(Ok(result));
+    Some(Ok(result))
 }
