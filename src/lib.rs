@@ -86,7 +86,7 @@ pub fn extract_insert_scene_colliders(
 
     //Go over all the found colliders and see if we can find an entity with a matching name 
     result.iter_mut().for_each(|(collider, _transform, name)|{
-        let Some(new_ent_name) = name.split("collider_").next() else {
+        let Some(new_ent_name) = name.split("collider_").last() else {
             return;
         };
 
