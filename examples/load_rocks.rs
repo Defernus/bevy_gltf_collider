@@ -1,9 +1,11 @@
+
 use bevy::prelude::*;
 use bevy_gltf_collider::get_scene_colliders;
 use bevy_rapier3d::prelude::*;
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, States, Default)]
 enum GameState {
+    #[default]
     Loading,
     Loaded,
 }
@@ -17,7 +19,7 @@ struct GameAssets {
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_state(GameState::Loading)
+        .add_state::<GameState>()
         .insert_resource(ClearColor(Color::rgb(0.7, 0.9, 1.0)))
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(RapierDebugRenderPlugin::default())
@@ -25,9 +27,9 @@ fn main() {
             brightness: 0.5,
             ..default()
         })
-        .add_system_set(SystemSet::on_enter(GameState::Loading).with_system(start_assets_loading))
-        .add_system_set(SystemSet::on_update(GameState::Loading).with_system(check_if_loaded))
-        .add_system_set(SystemSet::on_enter(GameState::Loaded).with_system(spawn_rocks))
+        .add_system(start_assets_loading.in_schedule(OnEnter(GameState::Loading)))
+        .add_system(check_if_loaded.in_set(OnUpdate(GameState::Loading)))
+        .add_system(spawn_rocks.in_schedule(OnEnter(GameState::Loaded)))
         .run();
 }
 
@@ -44,7 +46,7 @@ fn check_if_loaded(
     mut scenes: ResMut<Assets<Scene>>,
     mut game_assets: ResMut<GameAssets>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut game_state: ResMut<State<GameState>>,
+    mut game_state: ResMut<NextState<GameState>>,
 ) {
     let scene = if let Some(scene) = scenes.get_mut(&game_assets.rock_scene) {
         scene
@@ -56,7 +58,7 @@ fn check_if_loaded(
     game_assets.rock_colliders = get_scene_colliders(&mut meshes, &mut scene.world)
         .expect("Failed to create rock colliders");
 
-    game_state.set(GameState::Loaded).unwrap();
+    game_state.set(GameState::Loaded);
 }
 
 // spawn objects
@@ -105,7 +107,7 @@ fn spawn_rocks(mut commands: Commands, game_assets: Res<GameAssets>) {
                 for (collider, transform) in game_assets.rock_colliders.iter() {
                     parent.spawn((
                         collider.clone(),
-                        TransformBundle::from_transform(transform.clone()),
+                        TransformBundle::from_transform(*transform),
                     ));
                 }
             });

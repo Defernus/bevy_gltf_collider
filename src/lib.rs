@@ -57,3 +57,47 @@ pub fn get_scene_colliders(
 
     Ok(result)
 }
+
+///Pulls all of the scene colliders out of a scene, then parents them to a node with a matching suffix
+pub fn extract_insert_scene_colliders(
+    meshes: &mut Assets<Mesh>,
+    world: &mut World,
+) -> Result<Vec<(Collider, Transform, Name)>, ColliderFromSceneError> {
+    let mut result = Vec::new();
+    let mut entities_to_despawn = Vec::new();
+    let mut meshes_q = world.query::<(Entity, &Name, Option<&Children>)>();
+    let mut names_q = world.query::<(Entity, &Name)>();
+    
+    for (entity, entity_name, children) in meshes_q.iter(world) {
+        match process_mesh_collider(entity_name, children, world, meshes) {
+            None => {}
+            Some(Err(err)) => return Err(ColliderFromSceneError::MeshParsingError(err)),
+            Some(Ok(collider)) => {
+                let transform = *world.get::<Transform>(entity).unwrap();
+                result.push((collider, transform, entity_name.clone()));
+                entities_to_despawn.push(entity);
+            }
+        }
+    }
+
+    for e in entities_to_despawn {
+        despawn_with_children_recursive(world, e);
+    }
+
+    //Go over all the found colliders and see if we can find an entity with a matching name 
+    result.iter_mut().for_each(|(collider, _transform, name)|{
+        let Some(new_ent_name) = name.split("collider_").next() else {
+            return;
+        };
+
+        let Some((new_ent, _new_name)) = names_q.iter(world).find(|val|{val.1.trim() == new_ent_name.trim()})else{
+            warn!("Could not find matching Node for collider: {}", name);
+            return;
+        };
+
+        //If we found one that matches go ahead and add the collider
+        world.entity_mut(new_ent).insert(collider.clone());   
+    });
+    
+    Ok(result)
+}
