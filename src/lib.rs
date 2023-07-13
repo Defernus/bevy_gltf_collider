@@ -137,6 +137,6 @@ pub struct GLTFColliderPlugin;
 impl Plugin for GLTFColliderPlugin {
     fn build(&self, app: &mut App) {
         app.register_type::<SerializedCollider>();
-        app.add_system(hydrate_serialized_colliders);
+        app.add_systems(Update, (hydrate_serialized_colliders,));
     }
 }

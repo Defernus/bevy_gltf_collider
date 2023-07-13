@@ -20,15 +20,14 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_state::<GameState>()
         .insert_resource(ClearColor(Color::rgb(0.7, 0.9, 1.0)))
-        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
-        .add_plugin(RapierDebugRenderPlugin::default())
+        .add_plugins((RapierPhysicsPlugin::<NoUserData>::default(), RapierDebugRenderPlugin::default()))
         .insert_resource(AmbientLight {
             brightness: 0.5,
             ..default()
         })
-        .add_system(start_assets_loading.in_schedule(OnEnter(GameState::Loading)))
-        .add_system(check_if_loaded.in_set(OnUpdate(GameState::Loading)))
-        .add_system(spawn_monkeys.in_schedule(OnEnter(GameState::Loaded)))
+        .add_systems(OnEnter(GameState::Loading), (start_assets_loading,))
+        .add_systems(Update, (check_if_loaded,).run_if(in_state(GameState::Loading)))
+        .add_systems(OnEnter(GameState::Loaded), (spawn_monkeys,))
         .run();
 }
 
