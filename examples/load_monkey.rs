@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_gltf_collider::get_scene_colliders;
+use bevy_gltf_collider::mesh_collider::ColliderMeshType;
 use bevy_rapier3d::prelude::*;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, States, Default)]
@@ -20,13 +21,19 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_state::<GameState>()
         .insert_resource(ClearColor(Color::rgb(0.7, 0.9, 1.0)))
-        .add_plugins((RapierPhysicsPlugin::<NoUserData>::default(), RapierDebugRenderPlugin::default()))
+        .add_plugins((
+            RapierPhysicsPlugin::<NoUserData>::default(),
+            RapierDebugRenderPlugin::default(),
+        ))
         .insert_resource(AmbientLight {
             brightness: 0.5,
             ..default()
         })
         .add_systems(OnEnter(GameState::Loading), (start_assets_loading,))
-        .add_systems(Update, (check_if_loaded,).run_if(in_state(GameState::Loading)))
+        .add_systems(
+            Update,
+            (check_if_loaded,).run_if(in_state(GameState::Loading)),
+        )
         .add_systems(OnEnter(GameState::Loaded), (spawn_monkeys,))
         .run();
 }
@@ -53,8 +60,9 @@ fn check_if_loaded(
     };
 
     // get_scene_colliders should be called only once per scene as it will remove the colliders meshes from it
-    game_assets.monkey_colliders = get_scene_colliders(&mut meshes, &mut scene.world)
-        .expect("Failed to create monkey colliders");
+    game_assets.monkey_colliders =
+        get_scene_colliders(&mut meshes, &mut scene.world, ColliderMeshType::ConvexHull)
+            .expect("Failed to create monkey colliders");
 
     game_state.set(GameState::Loaded);
 }

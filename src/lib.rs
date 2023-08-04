@@ -1,3 +1,4 @@
+use crate::mesh_collider::ColliderMeshType;
 use bevy::{gltf::GltfExtras, prelude::*};
 use bevy_rapier3d::prelude::Collider;
 use extras_collider::{process_extras_collider, ColliderExtrasParsingError};
@@ -28,6 +29,7 @@ pub enum ColliderFromSceneError {
 pub fn get_scene_colliders(
     meshes: &mut Assets<Mesh>,
     world: &mut World,
+    mesh_type: ColliderMeshType,
 ) -> Result<Vec<(Collider, Transform)>, ColliderFromSceneError> {
     let mut result = Vec::new();
 
@@ -47,7 +49,7 @@ pub fn get_scene_colliders(
     let mut entities_to_despawn = Vec::new();
     let mut meshes_q = world.query::<(Entity, &Name, Option<&Children>)>();
     for (entity, entity_name, children) in meshes_q.iter(world) {
-        match process_mesh_collider(entity_name, children, world, meshes) {
+        match process_mesh_collider(entity_name, children, world, meshes, mesh_type) {
             None => {}
             Some(Err(err)) => return Err(ColliderFromSceneError::MeshParsingError(err)),
             Some(Ok(collider)) => {
@@ -69,6 +71,7 @@ pub fn get_scene_colliders(
 pub fn extract_insert_scene_colliders(
     meshes: &mut Assets<Mesh>,
     world: &mut World,
+    mesh_type: ColliderMeshType,
 ) -> Result<Vec<(Collider, Transform, Name)>, ColliderFromSceneError> {
     let mut result = Vec::new();
     let mut entities_to_despawn = Vec::new();
@@ -76,7 +79,7 @@ pub fn extract_insert_scene_colliders(
     let mut names_q = world.query::<(Entity, &Name)>();
 
     for (entity, entity_name, children) in meshes_q.iter(world) {
-        match process_mesh_collider(entity_name, children, world, meshes) {
+        match process_mesh_collider(entity_name, children, world, meshes, mesh_type) {
             None => {}
             Some(Err(err)) => return Err(ColliderFromSceneError::MeshParsingError(err)),
             Some(Ok(collider)) => {
