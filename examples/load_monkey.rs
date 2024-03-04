@@ -18,7 +18,7 @@ struct GameAssets {
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_state::<GameState>()
+        .init_state::<GameState>()
         .insert_resource(ClearColor(Color::rgb(0.7, 0.9, 1.0)))
         .add_plugins((RapierPhysicsPlugin::<NoUserData>::default(), RapierDebugRenderPlugin::default()))
         .insert_resource(AmbientLight {
