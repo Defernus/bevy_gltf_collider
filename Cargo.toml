@@ -7,8 +7,8 @@ edition = "2021"
 opt-level = 3
 
 [dependencies]
-bevy = { version = "0.12.0"}
-bevy_rapier3d = { version="0.23.0", features=['serde-serialize'] }
+bevy = { version = "0.13"}
+bevy_rapier3d = { version="0.25.0", features=['serde-serialize'] }
 serde_json = {version="1.0"}
 serde = {version="1.0"}
 bincode="1.3.3"
